@@ -37,7 +37,6 @@ class BaseConfig(argparse.Namespace):
 
         return text
 
-
 class SearchConfig(BaseConfig):
     def build_parser(self):
         parser = get_parser("Search config")
