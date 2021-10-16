@@ -52,28 +52,28 @@ services:
             mynetwork:
                 ipv4_address: 172.20.0.38
 
-    worker:
-        build:
-            context: ./autoNET
-            dockerfile: Dockerfile
-        image: geostream-fastapi:latest
-        depends_on:
-            - "kafka"
-            - "zookeeper"
-        restart: unless-stopped
-        command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 9000
-        volumes:
-            - ./autoNET/worker/:/usr/src/app
-        ports:
-            - 9000:9000
-        environment:
-            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
-            KAFKA_PORT: 9092
-        # env_file:
-        #     - ./autoNET/.env
-        networks:
-            mynetwork:
-                ipv4_address: 172.20.0.39
+    # worker:
+    #     build:
+    #         context: ./autoNET
+    #         dockerfile: Dockerfile
+    #     image: geostream-fastapi:latest
+    #     depends_on:
+    #         - "kafka"
+    #         - "zookeeper"
+    #     restart: unless-stopped
+    #     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 9000
+    #     volumes:
+    #         - ./autoNET/worker/:/usr/src/app
+    #     ports:
+    #         - 9000:9000
+    #     environment:
+    #         KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+    #         KAFKA_PORT: 9092
+    #     # env_file:
+    #     #     - ./autoNET/.env
+    #     networks:
+    #         mynetwork:
+    #             ipv4_address: 172.20.0.39
 
     # kafka-ui:
     #     image: provectuslabs/kafka-ui

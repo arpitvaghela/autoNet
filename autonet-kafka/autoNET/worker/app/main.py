@@ -66,6 +66,7 @@ class WebsocketConsumer(WebSocketEndpoint):
         logger.info("consumer stopped")
 
     async def on_receive(self, websocket: WebSocket, data: typing.Any) -> None:
+        print(data)
         await websocket.send_json({"Message: ": data})
 
     async def send_consumer_message(self, websocket: WebSocket, topicname: str) -> None:
@@ -74,6 +75,7 @@ class WebsocketConsumer(WebSocketEndpoint):
             data = await consume(self.consumer, topicname)
             # response = ConsumerResponse(topic=topicname, **json.loads(data))
             response = str(data)
+            print(f"worker:main[77]: {response}")
             logger.info(response)
             await websocket.send_text(f"{response}")
             self.counter = self.counter + 1
