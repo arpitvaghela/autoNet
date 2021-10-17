@@ -8,7 +8,7 @@ from starlette.config import Config
 config = Config(".env")
 
 
-PROJECT_NAME: str = config("PROJECT_NAME", default="geostream-kafka-consumer")
+PROJECT_NAME: str = config("PROJECT_NAME", default="autoNet-kafka-consumer")
 KAFKA_URI: str = config("KAFKA_HOST")
 KAFKA_PORT: str = config("KAFKA_PORT")
 KAFKA_INSTANCE = KAFKA_URI + ":" + KAFKA_PORT

@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import typing
 
 from aiokafka import AIOKafkaConsumer
@@ -7,8 +8,9 @@ from core.config import KAFKA_INSTANCE
 from core.config import PROJECT_NAME
 from loguru import logger
 import torch
+from darts.search import search
 
-topicname = "geostream"
+topicname = "training"
 
 
 async def consume(consumer, topicname):
@@ -33,13 +35,11 @@ async def func():
         data = await consume(consumer, topicname)
         # response = ConsumerResponse(topic=topicname, **json.loads(data))
         response = str(data)
-        if response:
+        print(f"worker:main[77]: {response}")
+        if response == "train":
             print("GPU Available")
             print(torch.cuda.is_available())
-
-        print(f"worker:main[77]: {response}")
-        # logger.info(response)
-        print("HEllo")
+            search("mnist-remote", "mnist", batch_size=16, epochs=1)
 
 
 asyncio.run(func())
