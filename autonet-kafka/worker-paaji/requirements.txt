@@ -13,3 +13,4 @@ uvicorn
 requests
 asyncio
 starlette
+kafka-logging-handler
