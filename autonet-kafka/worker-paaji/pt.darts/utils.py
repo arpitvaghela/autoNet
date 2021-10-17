@@ -9,9 +9,9 @@ import preproc
 from kafka_logger.handlers import KafkaLoggingHandler
 
 # TODO: use env
-KAFKA_BOOTSTRAP_SERVER = ('')
-KAFKA_CA = ''
-TOPIC = 'geostream'
+bstrap_server = dict(os.environ)["DOCKER_GATEWAY_HOST"]
+KAFKA_BOOTSTRAP_SERVER = (bstrap_server)
+TOPIC = 'log'
 
 def get_data(dataset, data_path, cutout_length, validation):
     """ Get torchvision dataset """

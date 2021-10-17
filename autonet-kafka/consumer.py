@@ -1,6 +1,8 @@
 from pykafka import KafkaClient
+import os
 
-client = KafkaClient(hosts="127.0.0.1:9092")
+bstrap_server = dict(os.environ)["DOCKER_GATEWAY_HOST"]
+client = KafkaClient(hosts=bstrap_server)
 
 
 def get_messages(topicname):
@@ -11,5 +13,5 @@ def get_messages(topicname):
     return events()
 
 
-for x in get_messages("geostream"):
+for x in get_messages("log"):
     print(x)
