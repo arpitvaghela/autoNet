@@ -6,7 +6,12 @@ import torch
 import torchvision.datasets as dset
 import numpy as np
 import preproc
+from kafka_logger.handlers import KafkaLoggingHandler
 
+# TODO: use env
+KAFKA_BOOTSTRAP_SERVER = ('')
+KAFKA_CA = ''
+TOPIC = 'geostream'
 
 def get_data(dataset, data_path, cutout_length, validation):
     """ Get torchvision dataset """
@@ -44,6 +49,12 @@ def get_logger(file_path):
     """ Make python logger """
     # [!] Since tensorboardX use default logger (e.g. logging.info()), we should use custom logger
     logger = logging.getLogger('darts')
+
+    #TODO: move this part of code to worker
+    kafak_handler_obj = KafkaLoggingHandler(KAFKA_BOOTSTRAP_SERVER,TOPIC)
+    logger.addHandler(kafak_handler_obj)
+    ##
+    
     log_format = '%(asctime)s | %(message)s'
     formatter = logging.Formatter(log_format, datefmt='%m/%d %I:%M:%S %p')
     file_handler = logging.FileHandler(file_path)
