@@ -4,12 +4,12 @@ import torch
 import torch.nn as nn
 import numpy as np
 from tensorboardX import SummaryWriter
-import config as cf
-from config import SearchConfig
-import utils
-from models.search_cnn import SearchCNNController
-from architect import Architect
-from visualize import plot
+import darts.config as cf
+from darts.config import SearchConfig
+import darts.utils as utils
+from darts.models.search_cnn import SearchCNNController
+from darts.architect import Architect
+from darts.visualize import plot
 
 
 def search(

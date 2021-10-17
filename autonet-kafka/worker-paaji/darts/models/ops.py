@@ -1,7 +1,7 @@
 """ Operations """
 import torch
 import torch.nn as nn
-import genotypes as gt
+import darts.genotypes as gt
 
 
 OPS = {

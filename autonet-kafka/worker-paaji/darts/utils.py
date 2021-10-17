@@ -5,11 +5,11 @@ import shutil
 import torch
 import torchvision.datasets as dset
 import numpy as np
-import preproc
+import darts.preproc as preproc
 from kafka_logger.handlers import KafkaLoggingHandler
 
 # TODO: use env
-bstrap_server = dict(os.environ)["DOCKER_GATEWAY_HOST"]
+bstrap_server = dict(os.environ)["KAFKA_HOST"]
 KAFKA_BOOTSTRAP_SERVER = (bstrap_server)
 TOPIC = 'log'
 
@@ -51,7 +51,7 @@ def get_logger(file_path):
     logger = logging.getLogger('darts')
 
     #TODO: move this part of code to worker
-    kafak_handler_obj = KafkaLoggingHandler(KAFKA_BOOTSTRAP_SERVER,TOPIC)
+    kafak_handler_obj = KafkaLoggingHandler(KAFKA_BOOTSTRAP_SERVER,TOPIC,security_protocol="PLAINTEXT")
     logger.addHandler(kafak_handler_obj)
     ##
     

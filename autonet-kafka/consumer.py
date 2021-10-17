@@ -1,7 +1,7 @@
 from pykafka import KafkaClient
 import os
 
-bstrap_server = dict(os.environ)["DOCKER_GATEWAY_HOST"]
+bstrap_server = dict(os.environ)["DOCKER_GATEWAY_HOST"]+":9092"
 client = KafkaClient(hosts=bstrap_server)
 
 

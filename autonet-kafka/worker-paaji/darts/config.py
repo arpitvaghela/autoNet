@@ -1,7 +1,7 @@
 """ Config class for search/augment """
 import argparse
 import os
-import genotypes as gt
+import darts.genotypes as gt
 from functools import partial
 import torch
 
