@@ -1,0 +1,15 @@
+numpy
+graphviz
+torch
+torchvision
+tensorboard
+tensorboardX
+aiokafka
+loguru
+pytest
+pytest-cov
+pytest-asyncio
+uvicorn
+requests
+asyncio
+starlette

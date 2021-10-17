@@ -8,11 +8,11 @@ from starlette.config import Config
 config = Config(".env")
 
 
-PROJECT_NAME: str = config("PROJECT_NAME", default="geostream-kafka-consumer")
-KAFKA_URI: str = '192.168.148.173'
-KAFKA_PORT: str = "9092"
+PROJECT_NAME: str = config("PROJECT_NAME", default="autoNET-controller")
+KAFKA_URI: str = config("KAFKA_HOST")
+KAFKA_PORT: str = config("KAFKA_PORT")
 KAFKA_INSTANCE = KAFKA_URI + ":" + KAFKA_PORT
-DEBUG: bool = config("DEBUG", cast=bool, default=False)
+DEBUG: bool = config("DEBUG", cast=bool, default=True)
 
 LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
 

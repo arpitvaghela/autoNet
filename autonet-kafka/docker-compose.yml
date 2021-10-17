@@ -52,7 +52,32 @@ services:
             mynetwork:
                 ipv4_address: 172.20.0.38
 
-    # worker:
+    worker-paaji:
+        build:
+            context: ./worker-paaji
+            dockerfile: Dockerfile
+
+        depends_on:
+            - "kafka"
+            - "zookeeper"
+            - "controller"
+        restart: unless-stopped
+        command: python3 /usr/src/app/main.py
+        volumes:
+            - ./worker-paaji/:/usr/src/app
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+        networks:
+            mynetwork:
+                ipv4_address: 172.20.0.39
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          capabilities: ["gpu"]
+
     #     build:
     #         context: ./autoNET
     #         dockerfile: Dockerfile
