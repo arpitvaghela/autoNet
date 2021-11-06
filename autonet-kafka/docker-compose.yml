@@ -78,6 +78,28 @@ services:
                         - driver: nvidia
                           capabilities: ["gpu"]
 
+    datastore:
+        build:
+            context: ./DB_Server
+            dockerfile: Dockerfile
+        depends_on:
+            - "kafka"
+            - "zookeeper"
+        restart: unless-stopped
+        command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8001
+        volumes:
+            - ./DB_Server/:/usr/src/app
+        ports:
+            - 8001:8001
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+        # env_file:
+        #     - ./autoNET/.env
+        networks:
+            mynetwork:
+                ipv4_address: 172.20.0.40
+
     #     build:
     #         context: ./autoNET
     #         dockerfile: Dockerfile

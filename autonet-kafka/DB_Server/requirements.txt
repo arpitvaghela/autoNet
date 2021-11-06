@@ -1,0 +1,10 @@
+numpy
+fastapi
+Pillow
+aiofiles
+pytest
+pytest-cov
+pytest-asyncio
+uvicorn
+requests
+python-multipart
