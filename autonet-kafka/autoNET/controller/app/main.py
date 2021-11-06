@@ -5,7 +5,7 @@ from aiokafka import AIOKafkaProducer
 from app.core.config import KAFKA_INSTANCE
 from app.core.config import PROJECT_NAME
 
-# from app.core.models.model import ProducerMessage
+from app.core.models.model import TrainMessage, TrainResponse
 # from app.core.models.model import ProducerResponse
 from fastapi import FastAPI
 
@@ -30,18 +30,21 @@ async def shutdown_event():
 
 
 @app.post("/producer/{topicname}")
-async def kafka_produce(msg, topicname: str):
+async def kafka_produce(msg:TrainMessage, topicname: str):
     """
     Produce a message into <topicname>
     This will produce a message into a Apache Kafka topic
     And this path operation will:
     * return ProducerResponse
     """
+    # why are we not waiting for response here ??
+    await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
+    response = TrainResponse(
+        name=msg.name, message_id=msg.message_id,topic =topicname
+    )
+    logger.info(response)
 
-    await aioproducer.send(topicname, msg.encode("ascii"))
-    logger.info(f"Produced {msg}")
-
-    return "Done"
+    return response
 
 
 @app.get("/ping")

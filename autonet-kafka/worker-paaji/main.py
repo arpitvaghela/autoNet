@@ -34,12 +34,14 @@ async def func():
     while True:
         data = await consume(consumer, topicname)
         # response = ConsumerResponse(topic=topicname, **json.loads(data))
-        response = str(data)
-        print(f"worker:main[77]: {response}")
-        if response == "train":
+        response = json.loads(data)
+        del response["timestamp"]
+        del response["message_id"]
+        if "task" in response and response["task"] == "train":
+            del response["task"]
             print("GPU Available")
             print(torch.cuda.is_available())
-            search("mnist-remote", "mnist", batch_size=16, epochs=1)
+            search(**response)
 
 
 asyncio.run(func())
