@@ -99,42 +99,57 @@ services:
         networks:
             mynetwork:
                 ipv4_address: 172.20.0.40
+    mongodb_container:
+        image: mongo:latest
+        environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: rootpassword
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb_data_container:/data/db
 
-    #     build:
-    #         context: ./autoNET
-    #         dockerfile: Dockerfile
-    #     image: geostream-fastapi:latest
-    #     depends_on:
-    #         - "kafka"
-    #         - "zookeeper"
-    #     restart: unless-stopped
-    #     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 9000
-    #     volumes:
-    #         - ./autoNET/worker/:/usr/src/app
-    #     ports:
-    #         - 9000:9000
-    #     environment:
-    #         KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
-    #         KAFKA_PORT: 9092
-    #     # env_file:
-    #     #     - ./autoNET/.env
-    #     networks:
-    #         mynetwork:
-    #             ipv4_address: 172.20.0.39
+        networks:
+            mynetwork:
+                ipv4_address: 172.20.0.41
 
-    # kafka-ui:
-    #     image: provectuslabs/kafka-ui
-    #     container_name: kafka-ui
-    #     ports:
-    #         - "8080:8080"
-    #     restart: always
-    #     depends_on:
-    #         - "zookeeper"
-    #         - "kafka"
-    #     environment:
-    #         - KAFKA_CLUSTERS_0_NAME=${DOCKER_GATEWAY_HOST}
-    #         - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=${DOCKER_GATEWAY_HOST}:9092
-    #         - KAFKA_CLUSTERS_0_ZOOKEEPER=${DOCKER_GATEWAY_HOST}:2181
-    #     networks:
-    #         mynetwork:
-    #             ipv4_address: 172.20.0.39
+volumes:
+    mongodb_data_container:
+        #     build:
+        #         context: ./autoNET
+        #         dockerfile: Dockerfile
+        #     image: geostream-fastapi:latest
+        #     depends_on:
+        #         - "kafka"
+        #         - "zookeeper"
+        #     restart: unless-stopped
+        #     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 9000
+        #     volumes:
+        #         - ./autoNET/worker/:/usr/src/app
+        #     ports:
+        #         - 9000:9000
+        #     environment:
+        #         KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+        #         KAFKA_PORT: 9092
+        #     # env_file:
+        #     #     - ./autoNET/.env
+        #     networks:
+        #         mynetwork:
+        #             ipv4_address: 172.20.0.39
+
+        # kafka-ui:
+        #     image: provectuslabs/kafka-ui
+        #     container_name: kafka-ui
+        #     ports:
+        #         - "8080:8080"
+        #     restart: always
+        #     depends_on:
+        #         - "zookeeper"
+        #         - "kafka"
+        #     environment:
+        #         - KAFKA_CLUSTERS_0_NAME=${DOCKER_GATEWAY_HOST}
+        #         - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=${DOCKER_GATEWAY_HOST}:9092
+        #         - KAFKA_CLUSTERS_0_ZOOKEEPER=${DOCKER_GATEWAY_HOST}:2181
+        #     networks:
+        #         mynetwork:
+        #             ipv4_address: 172.20.0.39
