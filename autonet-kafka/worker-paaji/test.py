@@ -2,7 +2,7 @@ from darts import search, utils
 import torch
 
 if __name__ == "__main__":
-    search.search("dog-cats", "custom", 32, epochs=1)
+    search.search("dog-cats", "custom", 20, epochs=3)
     # input_size, input_channels, n_classes, train_data = utils.get_data(
     #     "custom", "./dataset", cutout_length=0, validation=False
     # )

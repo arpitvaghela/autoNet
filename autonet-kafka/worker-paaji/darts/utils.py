@@ -36,10 +36,9 @@ class CustomDataset(dset.ImageFolder):
             transform=transform,
             target_transform=target_transform,
             loader=loader,
-            is_valid_file=is_valid_file,
         )
         data = []
-        for path, _ in self:
+        for path, _ in self.imgs:
             x = loader(path)
             x = x.resize((32, 32))
             data.append(np.asarray(x))
@@ -146,11 +145,10 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(output, target, topk=(1,1)):
     """Computes the precision@k for the specified values of k"""
     maxk = max(topk)
     batch_size = target.size(0)
-
     _, pred = output.topk(maxk, 1, True, True)
     pred = pred.t()
     # one-hot case

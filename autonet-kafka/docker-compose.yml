@@ -1,155 +1,155 @@
 version: "3"
 
 networks:
-  mynetwork:
-    ipam:
-      config:
-        - subnet: 172.21.0.0/24
+    mynetwork:
+        ipam:
+            config:
+                - subnet: 172.21.0.0/24
 
 services:
-  zookeeper:
-    image: wurstmeister/zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      mynetwork:
-        ipv4_address: 172.21.0.36
-  kafka:
-    image: wurstmeister/kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_GATEWAY_HOST}
-      KAFKA_CREATE_TOPICS: "training:1:1,log:1:1"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - "zookeeper"
-    networks:
-      mynetwork:
-        ipv4_address: 172.21.0.37
-  controller:
-    build:
-      context: ./autoNET
-      dockerfile: Dockerfile
-    image: geostream-fastapi:latest
-    depends_on:
-      - "kafka"
-      - "zookeeper"
-    restart: unless-stopped
-    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
-    volumes:
-      - ./autoNET/controller/:/usr/src/app
-    ports:
-      - 8000:8000
-    environment:
-      KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
-      KAFKA_PORT: 9092
-    # env_file:
-    #     - ./autoNET/.env
-    networks:
-      mynetwork:
-        ipv4_address: 172.21.0.38
+    zookeeper:
+        image: wurstmeister/zookeeper
+        ports:
+            - "2181:2181"
+        networks:
+            mynetwork:
+                ipv4_address: 172.21.0.36
+    kafka:
+        image: wurstmeister/kafka
+        ports:
+            - "9092:9092"
+        environment:
+            KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_GATEWAY_HOST}
+            KAFKA_CREATE_TOPICS: "training:1:1,log:1:1"
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        depends_on:
+            - "zookeeper"
+        networks:
+            mynetwork:
+                ipv4_address: 172.21.0.37
+    controller:
+        build:
+            context: ./autoNET
+            dockerfile: Dockerfile
+        image: geostream-fastapi:latest
+        depends_on:
+            - "kafka"
+            - "zookeeper"
+        restart: unless-stopped
+        command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+        volumes:
+            - ./autoNET/controller/:/usr/src/app
+        ports:
+            - 8000:8000
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+        # env_file:
+        #     - ./autoNET/.env
+        networks:
+            mynetwork:
+                ipv4_address: 172.21.0.38
 
-  worker-paaji:
-    build:
-      context: ./worker-paaji
-      dockerfile: Dockerfile
+    worker-paaji:
+        build:
+            context: ./worker-paaji
+            dockerfile: Dockerfile
 
-    depends_on:
-      - "kafka"
-      - "zookeeper"
-      - "controller"
-    restart: unless-stopped
-    command: python3 /usr/src/app/main.py
-    volumes:
-      - ./worker-paaji/:/usr/src/app
-    environment:
-      KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
-      KAFKA_PORT: 9092
-    networks:
-      mynetwork:
-        ipv4_address: 172.21.0.39
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: ["gpu"]
+        depends_on:
+            - "kafka"
+            - "zookeeper"
+            - "controller"
+        restart: unless-stopped
+        command: python3 /usr/src/app/main.py
+        volumes:
+            - ./worker-paaji/:/usr/src/app
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+        networks:
+            mynetwork:
+                ipv4_address: 172.21.0.39
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          capabilities: ["gpu"]
 
-  datastore:
-    build:
-      context: ./DB_Server
-      dockerfile: Dockerfile
-    # depends_on:
-    #   - "kafka"
-    #   - "zookeeper"
-    restart: unless-stopped
-    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8001
-    volumes:
-      - ./DB_Server/:/usr/src/app
-    ports:
-      - 8001:8001
-    environment:
-      KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
-      KAFKA_PORT: 9092
-    # env_file:
-    #     - ./autoNET/.env
-    networks:
-      mynetwork:
-        ipv4_address: 172.21.0.40
-  mongodb_container:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-    ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data_container:/data/db
+    datastore:
+        build:
+            context: ./DB_Server
+            dockerfile: Dockerfile
+        # depends_on:
+        #   - "kafka"
+        #   - "zookeeper"
+        restart: unless-stopped
+        command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8001
+        volumes:
+            - ./DB_Server/:/usr/src/app
+        ports:
+            - 8001:8001
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+        # env_file:
+        #     - ./autoNET/.env
+        networks:
+            mynetwork:
+                ipv4_address: 172.21.0.40
+    mongodb_container:
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: rootpassword
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb_data_container:/data/db
 
-    networks:
-      mynetwork:
-        ipv4_address: 172.21.0.41
+        networks:
+            mynetwork:
+                ipv4_address: 172.21.0.41
 
 volumes:
-  mongodb_data_container:
-    #     build:
-    #         context: ./autoNET
-    #         dockerfile: Dockerfile
-    #     image: geostream-fastapi:latest
-    #     depends_on:
-    #         - "kafka"
-    #         - "zookeeper"
-    #     restart: unless-stopped
-    #     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 9000
-    #     volumes:
-    #         - ./autoNET/worker/:/usr/src/app
-    #     ports:
-    #         - 9000:9000
-    #     environment:
-    #         KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
-    #         KAFKA_PORT: 9092
-    #     # env_file:
-    #     #     - ./autoNET/.env
-    #     networks:
-    #         mynetwork:
-    #             ipv4_address: 172.21.0.39
+    mongodb_data_container:
+        #     build:
+        #         context: ./autoNET
+        #         dockerfile: Dockerfile
+        #     image: geostream-fastapi:latest
+        #     depends_on:
+        #         - "kafka"
+        #         - "zookeeper"
+        #     restart: unless-stopped
+        #     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 9000
+        #     volumes:
+        #         - ./autoNET/worker/:/usr/src/app
+        #     ports:
+        #         - 9000:9000
+        #     environment:
+        #         KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+        #         KAFKA_PORT: 9092
+        #     # env_file:
+        #     #     - ./autoNET/.env
+        #     networks:
+        #         mynetwork:
+        #             ipv4_address: 172.21.0.39
 
-    # kafka-ui:
-    #     image: provectuslabs/kafka-ui
-    #     container_name: kafka-ui
-    #     ports:
-    #         - "8080:8080"
-    #     restart: always
-    #     depends_on:
-    #         - "zookeeper"
-    #         - "kafka"
-    #     environment:
-    #         - KAFKA_CLUSTERS_0_NAME=${DOCKER_GATEWAY_HOST}
-    #         - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=${DOCKER_GATEWAY_HOST}:9092
-    #         - KAFKA_CLUSTERS_0_ZOOKEEPER=${DOCKER_GATEWAY_HOST}:2181
-    #     networks:
-    #         mynetwork:
-    #             ipv4_address: 172.21.0.39
+        # kafka-ui:
+        #     image: provectuslabs/kafka-ui
+        #     container_name: kafka-ui
+        #     ports:
+        #         - "8080:8080"
+        #     restart: always
+        #     depends_on:
+        #         - "zookeeper"
+        #         - "kafka"
+        #     environment:
+        #         - KAFKA_CLUSTERS_0_NAME=${DOCKER_GATEWAY_HOST}
+        #         - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=${DOCKER_GATEWAY_HOST}:9092
+        #         - KAFKA_CLUSTERS_0_ZOOKEEPER=${DOCKER_GATEWAY_HOST}:2181
+        #     networks:
+        #         mynetwork:
+        #             ipv4_address: 172.21.0.39

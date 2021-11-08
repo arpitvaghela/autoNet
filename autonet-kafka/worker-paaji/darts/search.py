@@ -95,8 +95,8 @@ def search(
             # gradient clipping
             nn.utils.clip_grad_norm_(model.weights(), w_grad_clip)
             w_optim.step()
-
-            prec1, prec5 = utils.accuracy(logits, trn_y, topk=(1, 5))
+            maxk = min(5, n_classes - 1)
+            prec1, prec5 = utils.accuracy(logits, trn_y,topk=(1,maxk))
             losses.update(loss.item(), N)
             top1.update(prec1.item(), N)
             top5.update(prec5.item(), N)
@@ -138,8 +138,8 @@ def search(
 
                 logits = model(X)
                 loss = model.criterion(logits, y)
-
-                prec1, prec5 = utils.accuracy(logits, y, topk=(1, 5))
+                maxk = min(5, n_classes - 1)
+                prec1, prec5 = utils.accuracy(logits, y, topk=(1,maxk))
                 losses.update(loss.item(), N)
                 top1.update(prec1.item(), N)
                 top5.update(prec5.item(), N)
@@ -255,6 +255,7 @@ def search(
         # log
         # genotype
         genotype = model.genotype()
+        best_genotype = genotype
         logger.info("genotype = {}".format(genotype))
 
         # genotype as a image
