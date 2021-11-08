@@ -19,7 +19,7 @@ class Cutout(object):
         x1 = np.clip(x - self.length // 2, 0, w)
         x2 = np.clip(x + self.length // 2, 0, w)
 
-        mask[y1: y2, x1: x2] = 0.
+        mask[y1:y2, x1:x2] = 0.0
         mask = torch.from_numpy(mask)
         mask = mask.expand_as(img)
         img *= mask
@@ -29,33 +29,38 @@ class Cutout(object):
 
 def data_transforms(dataset, cutout_length):
     dataset = dataset.lower()
-    if dataset == 'cifar10':
+    if dataset == "cifar10":
         MEAN = [0.49139968, 0.48215827, 0.44653124]
         STD = [0.24703233, 0.24348505, 0.26158768]
         transf = [
             transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip()
+            transforms.RandomHorizontalFlip(),
         ]
-    elif dataset == 'mnist':
+    elif dataset == "mnist":
         MEAN = [0.13066051707548254]
         STD = [0.30810780244715075]
         transf = [
-            transforms.RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=0.1)
+            transforms.RandomAffine(
+                degrees=15, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=0.1
+            )
         ]
-    elif dataset == 'fashionmnist':
+    elif dataset == "fashionmnist":
         MEAN = [0.28604063146254594]
         STD = [0.35302426207299326]
         transf = [
-            transforms.RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=0.1),
-            transforms.RandomVerticalFlip()
+            transforms.RandomAffine(
+                degrees=15, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=0.1
+            ),
+            transforms.RandomVerticalFlip(),
         ]
+    elif dataset == "custom":
+        MEAN = [0.49139968, 0.48215827, 0.44653124]
+        STD = [0.24703233, 0.24348505, 0.26158768]
+        transf = [transforms.ToTensor()]
     else:
-        raise ValueError('not expected dataset = {}'.format(dataset))
+        raise ValueError("not expected dataset = {}".format(dataset))
 
-    normalize = [
-        transforms.ToTensor(),
-        transforms.Normalize(MEAN, STD)
-    ]
+    normalize = [transforms.Normalize(MEAN, STD)]
 
     train_transform = transforms.Compose(transf + normalize)
     valid_transform = transforms.Compose(normalize)
