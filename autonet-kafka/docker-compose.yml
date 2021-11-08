@@ -1,19 +1,17 @@
 version: "3"
 
-networks:
-    mynetwork:
-        ipam:
-            config:
-                - subnet: 172.21.0.0/24
+# networks:
+#     mynetwork:
+#         ipam:
+#             config:
+#                 - subnet: 172.21.0.0/24
 
 services:
     zookeeper:
         image: wurstmeister/zookeeper
         ports:
             - "2181:2181"
-        networks:
-            mynetwork:
-                ipv4_address: 172.21.0.36
+
     kafka:
         image: wurstmeister/kafka
         ports:
@@ -26,9 +24,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         depends_on:
             - "zookeeper"
-        networks:
-            mynetwork:
-                ipv4_address: 172.21.0.37
+
     controller:
         build:
             context: ./autoNET
@@ -48,9 +44,6 @@ services:
             KAFKA_PORT: 9092
         # env_file:
         #     - ./autoNET/.env
-        networks:
-            mynetwork:
-                ipv4_address: 172.21.0.38
 
     worker-paaji:
         build:
@@ -68,9 +61,6 @@ services:
         environment:
             KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
             KAFKA_PORT: 9092
-        networks:
-            mynetwork:
-                ipv4_address: 172.21.0.39
         deploy:
             resources:
                 reservations:
@@ -96,9 +86,7 @@ services:
             KAFKA_PORT: 9092
         # env_file:
         #     - ./autoNET/.env
-        networks:
-            mynetwork:
-                ipv4_address: 172.21.0.40
+
     mongodb_container:
         image: mongo:latest
         environment:
@@ -109,9 +97,27 @@ services:
         volumes:
             - mongodb_data_container:/data/db
 
-        networks:
-            mynetwork:
-                ipv4_address: 172.21.0.41
+    userservice:
+        build:
+            context: ./userservice
+            dockerfile: Dockerfile
+        depends_on:
+            - "mongodb_container"
+        #   - "zookeeper"
+        restart: unless-stopped
+        command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8002
+        volumes:
+            - ./userservice/:/usr/src/app
+        ports:
+            - 8002:8002
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+        # env_file:
+        #     - ./autoNET/.env
+        # networks:
+        #     mynetwork:
+        #         ipv4_address: 172.21.0.42
 
 volumes:
     mongodb_data_container:
