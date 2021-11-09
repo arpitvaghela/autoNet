@@ -12,6 +12,8 @@ from io import BytesIO
 from typing import Optional, List
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
+import requests
+import json
 
 ########## CONSTS ##########
 SAVE_IMAGE = False
@@ -100,6 +102,74 @@ async def upload(images: List[UploadFile] = File(...), target: UploadFile = File
         np.savez_compressed(
             DATASET_DIR + dataset_id + "/" + dataset_id, data_array, target_data
         )
+
+        return {
+            "success": True,
+            "message": "dataset created successully",
+            "dataset_id": dataset_id,
+        }
+    else:
+        return {"success": False, "message": "Please upload only png, jpg, jpeg files."}
+
+##############################################################
+########################## UPLOAD ############################
+
+@app.post("/upload/{pid}")
+async def upload(pid,images: List[UploadFile] = File(...), target: UploadFile = File(...)):
+
+    url = "http://userservice:8002/project/"+str(pid)
+
+    payload={}
+    headers = {}
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    responsejson=response.json()
+
+    if responsejson['code']!=200:
+        return {"success": False, "message":"wrong project id"}
+    # print(responsejson)
+    if not images or not target:
+        return {"success": False, "message": "Please upload both images and target"}
+    if is_image_files(images) and is_csv_file(target):
+        dataset_id = get_dataset_id()
+        os.mkdir(DATASET_DIR + dataset_id)
+        data_array = []
+        for file in images:
+            # convering to numpy array
+            image = np.array(read_imagefile(await file.read()))
+
+            # transformation
+            image = transform(image)
+
+            # adding to numpy array
+            data_array.append(image)
+
+            # for saving image file to dataset
+            if SAVE_IMAGE:
+                array_to_image(dataset_id, image, file)
+
+        # saving to npz file
+        data_array = np.array(data_array)
+        target_data = pd.read_csv(
+            StringIO(str(target.file.read(), "utf-8")), encoding="utf-8"
+        )
+        np.savez_compressed(
+            DATASET_DIR + dataset_id + "/" + dataset_id, data_array, target_data
+        )
+
+        url = "http://userservice:8002/project/"+str(pid)
+
+        payload = json.dumps({"dataid": dataset_id})
+        headers = {
+        'Content-Type': 'application/json'
+        }
+
+        response = requests.request("PUT", url, headers=headers, data=payload)
+
+        if response.json()["code"]!=200:
+            return{
+                "success":False
+            }
 
         return {
             "success": True,

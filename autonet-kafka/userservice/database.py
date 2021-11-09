@@ -63,9 +63,14 @@ async def retrieve_user(id: str) -> dict:
         return user_helper(user)
 
 async def retrieve_project(id: str) -> dict:
-    project = await projects_collection.find_one({"_id": ObjectId(id)})
-    if project:
-        return project_helper(project)
+    try:
+        project = await projects_collection.find_one({"_id": ObjectId(id)})
+        if project:
+            return project_helper(project)
+        else: 
+            return []
+    except:
+        return []
 
 # Update a user with a matching ID
 async def update_user(id: str, data: dict):
