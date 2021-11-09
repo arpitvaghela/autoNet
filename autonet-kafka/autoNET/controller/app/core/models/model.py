@@ -8,7 +8,6 @@ from pydantic.types import StrictStr
 
 class TrainMessage(BaseModel):
     projectid: str
-    dataid: str
     name: str
     dataset: str
     task: str = "train"
