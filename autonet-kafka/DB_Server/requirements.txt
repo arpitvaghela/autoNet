@@ -8,3 +8,4 @@ pytest-asyncio
 uvicorn
 requests
 python-multipart
+pandas

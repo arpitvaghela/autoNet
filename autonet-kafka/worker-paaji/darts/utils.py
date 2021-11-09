@@ -8,8 +8,8 @@ import numpy as np
 import darts.preproc as preproc
 from kafka_logger.handlers import KafkaLoggingHandler
 from typing import Optional, Callable, Any, Tuple
+import requests
 
-# TODO: use env
 bstrap_server = (
     dict(os.environ)["KAFKA_HOST"] if "KAFKA_HOST" in dict(os.environ) else ""
 )
@@ -17,32 +17,19 @@ KAFKA_BOOTSTRAP_SERVER = bstrap_server
 TOPIC = "log"
 
 
-def custom_loader(path):
-    img = dset.folder.default_loader(path)
-    return img.resize((32, 32))
+def get_dataid():
+    return "1636457617702"
 
 
-class CustomDataset(dset.ImageFolder):
-    def __init__(
-        self,
-        root: str,
-        transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None,
-        loader: Callable[[str], Any] = custom_loader,
-        is_valid_file: Optional[Callable[[str], bool]] = None,
-    ):
-        super().__init__(
-            root,
-            transform=transform,
-            target_transform=target_transform,
-            loader=loader,
-        )
-        data = []
-        for path, _ in self.imgs:
-            x = loader(path)
-            x = x.resize((32, 32))
-            data.append(np.asarray(x))
-        self.data = np.stack(data)
+def fetch_data(dataid):
+
+    url = f"http://localhost:8001/download/{dataid}"
+
+    response = requests.request("GET", url)
+    open(f"{dataid}.npz", "wb").write(response.content)
+    # TODO: try catch
+    data_ = np.load(f"{dataid}.npz")
+    return data_["arr_0"], data_["arr_1"]
 
 
 def get_data(dataset, data_path, cutout_length, validation):
@@ -59,12 +46,19 @@ def get_data(dataset, data_path, cutout_length, validation):
         dset_cls = dset.FashionMNIST
         n_classes = 10
     elif dataset == "custom":
-        dset_cls = CustomDataset
-        n_classes = 2
+        pass
 
     trn_transform, val_transform = preproc.data_transforms(dataset, cutout_length)
     if dataset == "custom":
-        trn_data = dset_cls("./dataset", transform=trn_transform)
+        dataid = get_dataid()
+        inputs, outputs = fetch_data(dataid)
+        inputs_tensor = torch.tensor(inputs, dtype=torch.float).permute(0, 3, 1, 2)
+        trn_data = torch.utils.data.TensorDataset(
+            inputs_tensor, torch.tensor(outputs).reshape(-1)
+        )
+        trn_data.data = inputs
+        n_classes = len(np.unique(outputs))
+        trn_data.target = outputs.reshape(-1).tolist()
     else:
         trn_data = dset_cls(
             root=data_path, train=True, download=True, transform=trn_transform
@@ -145,7 +139,7 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
-def accuracy(output, target, topk=(1,1)):
+def accuracy(output, target, topk=(1, 1)):
     """Computes the precision@k for the specified values of k"""
     maxk = max(topk)
     batch_size = target.size(0)

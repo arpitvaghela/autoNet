@@ -96,7 +96,7 @@ def search(
             nn.utils.clip_grad_norm_(model.weights(), w_grad_clip)
             w_optim.step()
             maxk = min(5, n_classes - 1)
-            prec1, prec5 = utils.accuracy(logits, trn_y,topk=(1,maxk))
+            prec1, prec5 = utils.accuracy(logits, trn_y, topk=(1, maxk))
             losses.update(loss.item(), N)
             top1.update(prec1.item(), N)
             top5.update(prec5.item(), N)
@@ -139,7 +139,7 @@ def search(
                 logits = model(X)
                 loss = model.criterion(logits, y)
                 maxk = min(5, n_classes - 1)
-                prec1, prec5 = utils.accuracy(logits, y, topk=(1,maxk))
+                prec1, prec5 = utils.accuracy(logits, y, topk=(1, maxk))
                 losses.update(loss.item(), N)
                 top1.update(prec1.item(), N)
                 top5.update(prec5.item(), N)
@@ -187,17 +187,28 @@ def search(
 
     net_crit = nn.CrossEntropyLoss().to(device)
     model = SearchCNNController(
-        input_channels, init_channels, n_classes, layers, net_crit, device_ids=gpus,
+        input_channels,
+        init_channels,
+        n_classes,
+        layers,
+        net_crit,
+        device_ids=gpus,
     )
     model = model.to(device)
 
     # weights optimizer
     w_optim = torch.optim.SGD(
-        model.weights(), w_lr, momentum=w_momentum, weight_decay=w_weight_decay,
+        model.weights(),
+        w_lr,
+        momentum=w_momentum,
+        weight_decay=w_weight_decay,
     )
     # alphas optimizer
     alpha_optim = torch.optim.Adam(
-        model.alphas(), alpha_lr, betas=(0.5, 0.999), weight_decay=alpha_weight_decay,
+        model.alphas(),
+        alpha_lr,
+        betas=(0.5, 0.999),
+        weight_decay=alpha_weight_decay,
     )
 
     # split data to train/validation

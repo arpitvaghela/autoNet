@@ -60,7 +60,7 @@ def data_transforms(dataset, cutout_length):
     else:
         raise ValueError("not expected dataset = {}".format(dataset))
 
-    normalize = [transforms.Normalize(MEAN, STD)]
+    normalize = [transforms.ToTensor(), transforms.Normalize(MEAN, STD)]
 
     train_transform = transforms.Compose(transf + normalize)
     valid_transform = transforms.Compose(normalize)
