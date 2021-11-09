@@ -19,12 +19,12 @@ TOPIC = "log"
 
 def get_dataid(projectid: str):
     print(projectid)
-    return "1636457617702"
+    return projectid
 
 
 def fetch_data(dataid):
 
-    url = f"http://localhost:8001/download/{dataid}"
+    url = f"http://datastore:8001/download/{dataid}"
 
     response = requests.request("GET", url)
     open(f"{dataid}.npz", "wb").write(response.content)

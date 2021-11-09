@@ -45,9 +45,9 @@ services:
         # env_file:
         #     - ./autoNET/.env
 
-    worker-paaji:
+    worker:
         build:
-            context: ./worker-paaji
+            context: ./worker
             dockerfile: Dockerfile
 
         depends_on:
@@ -57,7 +57,7 @@ services:
         restart: unless-stopped
         command: python3 /usr/src/app/main.py
         volumes:
-            - ./worker-paaji/:/usr/src/app
+            - ./worker/:/usr/src/app
         environment:
             KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
             KAFKA_PORT: 9092

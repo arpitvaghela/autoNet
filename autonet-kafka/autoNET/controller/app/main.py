@@ -1,8 +1,6 @@
 import asyncio
 import json
 
-from google.protobuf import message
-
 from aiokafka import AIOKafkaProducer
 from app.core.config import KAFKA_INSTANCE
 from app.core.config import PROJECT_NAME
@@ -48,16 +46,16 @@ async def kafka_produce(msg: TrainMessage, topicname: str):
     if responsejson["code"] != 200:
         return {"success": False, "code": 400, "message": "wrong project id"}
 
-    if responsejson["dataid"] == "":
+    if responsejson["data"][0]["dataid"] == "":
         return {
             "success": False,
             "code": 404,
             "message": "please provide data to train on",
         }
 
-    msg.update({"dataid": responsejson["dataid"]})
+    msgjson = json.loads(msg.json()).update({"dataid": responsejson["data"][0]["dataid"]})
     # request worker to search for projectid
-    await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
+    await aioproducer.send(topicname, json.dumps(msgjson).encode("ascii"))
     # TODO: send back project and data ids
     response = TrainResponse(name=msg.name, message_id=msg.message_id, topic=topicname)
     logger.info(response)
