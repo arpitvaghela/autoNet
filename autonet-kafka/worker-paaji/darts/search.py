@@ -30,15 +30,21 @@ def search(
     workers: int = 4,
     alpha_lr: float = 3e-4,
     alpha_weight_decay: float = 1e-3,
+    projectid: str = "",
+    dataid: str = "",
 ):
     """TODO: Add docstring"""
+
+    if dataset == "custom" and (projectid == "" or dataid == ""):
+        raise ValueError
+
     # tensorboard
     if isinstance(gpus, str):
         gpus = cf.parse_gpus(gpus)
 
     device = torch.device("cuda")
     data_path = "./data/"
-
+    print(projectid)
     path = os.path.join("searchs", name)
     plot_path = os.path.join(path, "plots")
 
@@ -182,7 +188,12 @@ def search(
 
     # get data with meta info
     input_size, input_channels, n_classes, train_data = utils.get_data(
-        dataset, data_path, cutout_length=0, validation=False
+        dataset,
+        data_path,
+        cutout_length=0,
+        validation=False,
+        projectid=projectid,
+        dataid=dataid,
     )
 
     net_crit = nn.CrossEntropyLoss().to(device)

@@ -5,10 +5,13 @@ from pydantic import BaseModel
 from pydantic import validator
 from pydantic.types import StrictStr
 
+
 class TrainMessage(BaseModel):
-    name:str
+    projectid: str
+    dataid: str
+    name: str
     dataset: str
-    task:str = "train"
+    task: str = "train"
     timestamp: StrictStr = ""
     message_id: StrictStr = ""
     batch_size: int = 64
@@ -38,6 +41,7 @@ class TrainMessage(BaseModel):
     def set_datetime_utcnow(cls, v):
         return str(datetime.utcnow())
 
+
 class TrainResponse(BaseModel):
     name: StrictStr
     message_id: StrictStr
@@ -47,4 +51,3 @@ class TrainResponse(BaseModel):
     @validator("timestamp", pre=True, always=True)
     def set_datetime_utcnow(cls, v):
         return str(datetime.utcnow())
-

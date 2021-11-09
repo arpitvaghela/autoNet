@@ -17,7 +17,8 @@ KAFKA_BOOTSTRAP_SERVER = bstrap_server
 TOPIC = "log"
 
 
-def get_dataid():
+def get_dataid(projectid: str):
+    print(projectid)
     return "1636457617702"
 
 
@@ -32,7 +33,9 @@ def fetch_data(dataid):
     return data_["arr_0"], data_["arr_1"]
 
 
-def get_data(dataset, data_path, cutout_length, validation):
+def get_data(
+    dataset, data_path, cutout_length, validation, projectid: str = "", dataid: str = ""
+):
     """Get torchvision dataset"""
     dataset = dataset.lower()
 
@@ -50,7 +53,7 @@ def get_data(dataset, data_path, cutout_length, validation):
 
     trn_transform, val_transform = preproc.data_transforms(dataset, cutout_length)
     if dataset == "custom":
-        dataid = get_dataid()
+        # dataid = get_dataid(projectid)
         inputs, outputs = fetch_data(dataid)
         inputs_tensor = torch.tensor(inputs, dtype=torch.float).permute(0, 3, 1, 2)
         trn_data = torch.utils.data.TensorDataset(

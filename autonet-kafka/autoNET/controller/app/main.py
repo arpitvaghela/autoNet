@@ -1,15 +1,19 @@
 import asyncio
 import json
 
+from google.protobuf import message
+
 from aiokafka import AIOKafkaProducer
 from app.core.config import KAFKA_INSTANCE
 from app.core.config import PROJECT_NAME
 
 from app.core.models.model import TrainMessage, TrainResponse
+
 # from app.core.models.model import ProducerResponse
 from fastapi import FastAPI
 
 from loguru import logger
+import requests
 
 app = FastAPI(title=PROJECT_NAME)
 
@@ -30,7 +34,7 @@ async def shutdown_event():
 
 
 @app.post("/producer/{topicname}")
-async def kafka_produce(msg:TrainMessage, topicname: str):
+async def kafka_produce(msg: TrainMessage, topicname: str):
     """
     Produce a message into <topicname>
     This will produce a message into a Apache Kafka topic
@@ -38,10 +42,24 @@ async def kafka_produce(msg:TrainMessage, topicname: str):
     * return ProducerResponse
     """
     # why are we not waiting for response here ??
+    url = "http://userservice:8002/project/" + str(msg.projectid)
+    response = requests.request("GET", url)
+    responsejson = response.json()
+    if responsejson["code"] != 200:
+        return {"success": False, "code": 400, "message": "wrong project id"}
+
+    if responsejson["dataid"] == "":
+        return {
+            "success": False,
+            "code": 404,
+            "message": "please provide data to train on",
+        }
+
+    msg.update({"dataid": responsejson["dataid"]})
+    # request worker to search for projectid
     await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
-    response = TrainResponse(
-        name=msg.name, message_id=msg.message_id,topic =topicname
-    )
+    # TODO: send back project and data ids
+    response = TrainResponse(name=msg.name, message_id=msg.message_id, topic=topicname)
     logger.info(response)
 
     return response
