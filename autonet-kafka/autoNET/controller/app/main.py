@@ -53,9 +53,11 @@ async def kafka_produce(msg: TrainMessage, topicname: str):
             "message": "please provide data to train on",
         }
 
-    msgjson = json.loads(msg.json()).update({"dataid": responsejson["data"][0]["dataid"]})
+    msgdict = msg.dict()
+    msgdict.update({"dataid": responsejson["data"][0]["dataid"]})
+    logger.info(f"{msgdict} {type(msgdict)}")
     # request worker to search for projectid
-    await aioproducer.send(topicname, json.dumps(msgjson).encode("ascii"))
+    await aioproducer.send(topicname, json.dumps(msgdict).encode("ascii"))
     # TODO: send back project and data ids
     response = TrainResponse(name=msg.name, message_id=msg.message_id, topic=topicname)
     logger.info(response)
