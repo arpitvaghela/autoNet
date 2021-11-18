@@ -1,0 +1,48 @@
+upstream controller_server {
+    server controller:8000;
+}
+
+upstream datastore_server {
+    server datastore:8001;
+}
+
+upstream userservice_server {
+    server userservice:8002;
+}
+
+server {
+    listen 80;
+
+    root /;
+
+    location /api_controller/ {
+        proxy_pass http://controller_server$request_uri;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $https;
+        proxy_connect_timeout 360s;
+        proxy_read_timeout 360s;
+    }
+
+    location /api_datastore/ {
+        proxy_pass http://datastore_server$request_uri;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $https;
+        proxy_connect_timeout 360s;
+        proxy_read_timeout 360s;
+    }
+
+    location /api_user/ {
+        proxy_pass http://userservice_server$request_uri;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $https;
+        proxy_connect_timeout 360s;
+        proxy_read_timeout 360s;
+    }
+    
+}
