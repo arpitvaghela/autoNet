@@ -31,4 +31,4 @@ ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /usr/src/app/requirements.txt
 
-RUN pip3.8 install --no-cache-dir -r requirements.txt
+RUN pip3.8 install git+https://github.com/arpitvaghela/autoNet.git#subdirectory=autonet-kafka/worker/darts
