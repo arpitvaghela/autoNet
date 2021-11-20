@@ -17,15 +17,10 @@ KAFKA_BOOTSTRAP_SERVER = bstrap_server
 TOPIC = "log"
 
 
-def get_dataid(projectid: str):
-    print(projectid)
-    return projectid
-
-
 def fetch_data(dataid):
 
-    url = f"http://datastore:8001/download/{dataid}"
-
+    # url = f"http://datastore:8001/download/{dataid}"
+    url = f"http://localhost:8001/download/{dataid}"
     response = requests.request("GET", url)
     open(f"{dataid}.npz", "wb").write(response.content)
     # TODO: try catch
@@ -75,7 +70,7 @@ def get_data(
     input_size = shape[1]
 
     ret = [input_size, input_channels, n_classes, trn_data]
-    if validation:  # append validation data
+    if validation and not dataset == "custom":  # append validation data
         ret.append(
             dset_cls(
                 root=data_path, train=False, download=True, transform=val_transform

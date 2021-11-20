@@ -10,6 +10,27 @@ import darts.utils as utils
 from darts.models.search_cnn import SearchCNNController
 from darts.architect import Architect
 from darts.visualize import plot
+import darts.genotypes as gt
+from darts.models import ops
+from typing import List
+
+
+def set_primitives(primitives: List[str]):
+    gt.PRIMITIVES = primitives
+
+
+def set_default_primitives():
+    gt.PRIMITIVES = [
+        "max_pool_3x3",
+        "avg_pool_3x3",
+        "skip_connect",  # identity
+        "sep_conv_3x3",
+        "sep_conv_5x5",
+        "sep_conv_7x7",
+        "dil_conv_3x3",
+        "dil_conv_5x5",
+        "none",
+    ]
 
 
 def search(
@@ -34,9 +55,12 @@ def search(
     dataid: str = "",
 ):
     """TODO: Add docstring"""
-
-    if dataset == "custom" and (projectid == "" or dataid == ""):
+    if dataset == "custom" and (projectid == "" and dataid == ""):
         raise ValueError
+
+    # set primitive
+    if not hasattr(gt, "PRIMITIVES"):
+        set_default_primitives()
 
     # tensorboard
     if isinstance(gpus, str):
@@ -50,7 +74,6 @@ def search(
 
     writer = SummaryWriter(log_dir=os.path.join(path, "tb"))
     # writer.add_text("config", as_markdown(), 0)
-
     logger = utils.get_logger(os.path.join(path, "{}.log".format(name)))
 
     def train(
@@ -298,6 +321,7 @@ def search(
 
     logger.info("Final best Prec@1 = {:.4%}".format(best_top1))
     logger.info("Best Genotype = {}".format(best_genotype))
+    return best_genotype
 
 
 if __name__ == "__main__":

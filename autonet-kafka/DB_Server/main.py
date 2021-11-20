@@ -17,8 +17,8 @@ import json
 
 ########## CONSTS ##########
 SAVE_IMAGE = False
-HEIGHT = 64
-WIDTH = 64
+HEIGHT = 32
+WIDTH = 32
 DATASET_DIR = "./datasets/"
 ############################
 app = FastAPI()
@@ -111,22 +111,26 @@ async def upload(images: List[UploadFile] = File(...), target: UploadFile = File
     else:
         return {"success": False, "message": "Please upload only png, jpg, jpeg files."}
 
+
 ##############################################################
 ########################## UPLOAD ############################
 
+
 @app.post("/upload/{pid}")
-async def upload(pid,images: List[UploadFile] = File(...), target: UploadFile = File(...)):
+async def upload(
+    pid, images: List[UploadFile] = File(...), target: UploadFile = File(...)
+):
 
-    url = "http://userservice:8002/project/"+str(pid)
+    url = "http://userservice:8002/project/" + str(pid)
 
-    payload={}
+    payload = {}
     headers = {}
 
     response = requests.request("GET", url, headers=headers, data=payload)
-    responsejson=response.json()
+    responsejson = response.json()
 
-    if responsejson['code']!=200:
-        return {"success": False, "message":"wrong project id"}
+    if responsejson["code"] != 200:
+        return {"success": False, "message": "wrong project id"}
     # print(responsejson)
     if not images or not target:
         return {"success": False, "message": "Please upload both images and target"}
@@ -157,19 +161,15 @@ async def upload(pid,images: List[UploadFile] = File(...), target: UploadFile = 
             DATASET_DIR + dataset_id + "/" + dataset_id, data_array, target_data
         )
 
-        url = "http://userservice:8002/project/"+str(pid)
+        url = "http://userservice:8002/project/" + str(pid)
 
         payload = json.dumps({"dataid": dataset_id})
-        headers = {
-        'Content-Type': 'application/json'
-        }
+        headers = {"Content-Type": "application/json"}
 
         response = requests.request("PUT", url, headers=headers, data=payload)
 
-        if response.json()["code"]!=200:
-            return{
-                "success":False
-            }
+        if response.json()["code"] != 200:
+            return {"success": False}
 
         return {
             "success": True,
