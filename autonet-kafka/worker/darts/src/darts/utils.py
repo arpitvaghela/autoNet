@@ -17,8 +17,30 @@ KAFKA_BOOTSTRAP_SERVER = bstrap_server
 TOPIC = "log"
 
 
-def fetch_data(dataid):
+class CIFAR4(dset.CIFAR10):
+    def __init__(
+        self,
+        root: str,
+        train: bool = True,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        download: bool = False,
+    ) -> None:
+        super().__init__(
+            root,
+            train=train,
+            transform=transform,
+            target_transform=target_transform,
+            download=download,
+        )
+        targets = np.array(self.targets)
+        idx = np.argwhere(targets < 4)
+        idx = np.random.choice(idx.reshape(-1), size=int(0.16 * len(self)))
+        self.targets = targets[idx]
+        self.data = self.data[idx]
 
+
+def fetch_data(dataid):
     # url = f"http://datastore:8001/download/{dataid}"
     url = f"http://localhost:8001/download/{dataid}"
     response = requests.request("GET", url)
@@ -37,6 +59,9 @@ def get_data(
     if dataset == "cifar10":
         dset_cls = dset.CIFAR10
         n_classes = 10
+    elif dataset == "cifar4":
+        dset_cls = CIFAR4
+        n_classes = 4
     elif dataset == "mnist":
         dset_cls = dset.MNIST
         n_classes = 10
@@ -85,12 +110,12 @@ def get_logger(file_path):
     # [!] Since tensorboardX use default logger (e.g. logging.info()), we should use custom logger
     logger = logging.getLogger("darts")
 
-    # TODO: move this part of code to worker
-    kafak_handler_obj = KafkaLoggingHandler(
-        KAFKA_BOOTSTRAP_SERVER, TOPIC, security_protocol="PLAINTEXT"
-    )
-    logger.addHandler(kafak_handler_obj)
-    ##
+    # # TODO: move this part of code to worker
+    # kafak_handler_obj = KafkaLoggingHandler(
+    #     KAFKA_BOOTSTRAP_SERVER, TOPIC, security_protocol="PLAINTEXT"
+    # )
+    # logger.addHandler(kafak_handler_obj)
+    # ##
 
     log_format = "%(asctime)s | %(message)s"
     formatter = logging.Formatter(log_format, datefmt="%m/%d %I:%M:%S %p")
