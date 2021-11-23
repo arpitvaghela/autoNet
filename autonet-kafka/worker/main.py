@@ -9,8 +9,23 @@ from core.config import PROJECT_NAME
 from loguru import logger
 import torch
 from darts.search import search
+import uuid
+import requests
+from fastapi import FastAPI
 
 topicname = "training"
+workerid = None
+available = True
+
+
+def register_self():
+    uid = uuid.uuid4()
+    url = f"http://controller:8000/worker/register/{uid}"
+    response = requests.request("GET", url)
+    msg = response.json()
+    logger.info(msg)
+    global workerid
+    workerid = msg["worker_id"]
 
 
 async def consume(consumer, topicname):
@@ -19,7 +34,6 @@ async def consume(consumer, topicname):
 
 
 async def func():
-
     loop = asyncio.get_event_loop()
     consumer = AIOKafkaConsumer(
         topicname,
@@ -31,23 +45,50 @@ async def func():
 
     await consumer.start()
 
+    register_self()
+
     while True:
         data = await consume(consumer, topicname)
         # response = ConsumerResponse(topic=topicname, **json.loads(data))
         print(data)
-        
+
         response = json.loads(data)
-        print(response)
+        print(response["workerid"], workerid)
+        if not response["workerid"] == workerid:
+            logger.info(f"Skipping request directed to worker: {response['workerid']}")
+            continue
         try:
             del response["timestamp"]
             del response["message_id"]
+            del response["workerid"]
         except:
             pass
         if "task" in response and response["task"] == "train":
             del response["task"]
             print("GPU Available")
             print(torch.cuda.is_available())
+            global available
+            available = False
             search(**response)
+            available = True
 
 
-asyncio.run(func())
+# asyncio.run(func())
+
+app = FastAPI(title="worker")
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(func())
+
+
+@app.get("/available")
+async def ping():
+    global available
+    return {"available": available}
+
+
+@app.get("/")
+async def root():
+    return "Lord worker said Hello!"

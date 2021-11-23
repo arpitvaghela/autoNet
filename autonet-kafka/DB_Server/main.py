@@ -17,8 +17,8 @@ import json
 
 ########## CONSTS ##########
 SAVE_IMAGE = False
-HEIGHT = 64
-WIDTH = 64
+HEIGHT = 32
+WIDTH = 32
 DATASET_DIR = "./datasets/"
 ############################
 app = FastAPI()

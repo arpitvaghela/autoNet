@@ -18,10 +18,10 @@ RUN apt-get install curl wget -y
 RUN apt-get install linux-libc-dev -y
 
 RUN apt-get install libc6-dev -y
+RUN apt-get install graphviz -y
 
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN  python3.8 get-pip.py
-
 WORKDIR /usr/src/app
 
 # dont write pyc files

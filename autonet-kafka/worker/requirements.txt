@@ -14,3 +14,4 @@ requests
 asyncio
 starlette
 kafka-logging-handler
+fastapi
