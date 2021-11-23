@@ -8,6 +8,8 @@ if running controller locally
 
 ```
 export DOCKER_GATEWAY_HOST=$(hostname -I |awk '{print $1}')
+export SYSTEM_IP=$(hostname -I |awk '{print $1}')
+sudo -E docker-compose up
 ```
 
 if running controller and kafka elsewhere
