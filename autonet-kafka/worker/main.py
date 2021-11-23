@@ -4,7 +4,7 @@ import logging
 import typing
 
 from aiokafka import AIOKafkaConsumer
-from core.config import KAFKA_INSTANCE, KAFKA_URI, WORKER_PORT, CONTROLLER_IP
+from core.config import KAFKA_INSTANCE, WORKER_PORT, CONTROLLER_IP, WORKER_IP
 from core.config import PROJECT_NAME
 from loguru import logger
 import torch
@@ -19,7 +19,7 @@ available = True
 
 
 def register_self():
-    uid = KAFKA_URI + "_" + WORKER_PORT
+    uid = WORKER_IP + "_" + WORKER_PORT
     url = f"http://{CONTROLLER_IP}:8000/worker/register/{uid}"
     response = requests.request("GET", url)
     msg = response.json()

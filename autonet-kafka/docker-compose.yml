@@ -63,8 +63,9 @@ services:
         environment:
             KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
             KAFKA_PORT: 9092
+            WORKER_IP: ${SYSTEM_IP}
             WORKER_PORT: 5010
-            CONTROLLER_IP: controller
+            CONTROLLER_IP: ${DOCKER_GATEWAY_HOST}
         deploy:
             resources:
                 reservations:

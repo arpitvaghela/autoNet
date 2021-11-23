@@ -4,7 +4,16 @@ docker script
 
 to run compose use
 
+if running controller locally
+
 ```
 export DOCKER_GATEWAY_HOST=$(hostname -I |awk '{print $1}')
+```
+
+if running controller and kafka elsewhere
+
+```
+export DOCKER_GATEWAY_HOST= <YOUR IP ADDRESS>
+export SYSTEM_IP=$(hostname -I |awk '{print $1}')
 sudo -E docker-compose up
 ```
