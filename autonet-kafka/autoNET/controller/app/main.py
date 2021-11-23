@@ -52,7 +52,7 @@ class BackgroundQueueHandler:
         while True:
             # print("running queueing service")
             if len(self.queue) == 0:
-                await asyncio.sleep(1)
+                await asyncio.sleep(5)
                 continue
             else:
                 worker_idx = self.find_available_worker()
@@ -66,7 +66,7 @@ class BackgroundQueueHandler:
                         topicname, json.dumps(msgdict).encode("ascii")
                     )
                     self.queue.pop()
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(5)
                     continue
 
                 logger.info("Here in working terrain")

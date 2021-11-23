@@ -12,14 +12,16 @@ from darts.search import search
 import uuid
 import requests
 from fastapi import FastAPI
+import threading
+import docker
 
 topicname = "training"
 workerid = None
 available = True
 
-
 def register_self():
     uid = uuid.uuid4()
+
     url = f"http://controller:8000/worker/register/{uid}"
     response = requests.request("GET", url)
     msg = response.json()
@@ -67,16 +69,24 @@ async def func():
             del response["task"]
             print("GPU Available")
             print(torch.cuda.is_available())
-            global available
-            available = False
-            search(**response)
-            available = True
+            await train(response)
+            #global available
+            # available = False
+            # search(**response)
+            # available = True
 
-
+async def train(args):
+    t = threading.Thread(target=search,kwargs=args)
+    t.start()
+    global available
+    available = False
+    while t.is_alive():
+        await asyncio.sleep(5)
+    available = True    
+        
 # asyncio.run(func())
 
 app = FastAPI(title="worker")
-
 
 @app.on_event("startup")
 async def startup_event():
