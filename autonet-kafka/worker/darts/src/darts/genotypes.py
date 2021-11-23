@@ -20,6 +20,11 @@ Genotype = namedtuple("Genotype", "normal normal_concat reduce reduce_concat")
 #     "sep_conv_7x7",
 #     "dil_conv_3x3",
 #     "dil_conv_5x5",
+#     "conv_7x1_1x7",
+#     "conv_5x1_1x5",
+#     "conv_3x1_1x3",
+#     "sep_conv_2x2",
+#     "dil_conv_2x2",
 #     "none",
 # ]
 
