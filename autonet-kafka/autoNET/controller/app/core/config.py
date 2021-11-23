@@ -12,7 +12,7 @@ PROJECT_NAME: str = config("PROJECT_NAME", default="autoNET-controller")
 KAFKA_URI: str = config("KAFKA_HOST")
 KAFKA_PORT: str = config("KAFKA_PORT")
 KAFKA_INSTANCE = KAFKA_URI + ":" + KAFKA_PORT
-DEBUG: bool = config("DEBUG", cast=bool, default=True)
+DEBUG: bool = config("DEBUG", cast=bool, default=False)
 
 LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
 

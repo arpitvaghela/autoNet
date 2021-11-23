@@ -26,8 +26,8 @@ aioproducer = AIOKafkaProducer(
 
 
 class Worker:
-    def __init__(self, id, available):
-        self.id = id
+    def __init__(self, ip: str, available: bool):
+        self.ip = ip
         self.available = available
 
 
@@ -40,13 +40,14 @@ class BackgroundQueueHandler:
         self.workers: List[Worker] = []
 
     def find_available_worker(self):
-        worker_path = "http://worker:5001/available"
-        response = requests.request("GET", worker_path)
-        msg = response.json()
-        logger.info(msg)
-        if msg["available"]:
-            return 0
-        return -1
+        for i, worker in enumerate(self.workers):
+            worker_path = f"http://{worker.ip}/available"
+            response = requests.request("GET", worker_path)
+            msg = response.json()
+            logger.info(msg)
+            if msg["available"]:
+                return i
+            return -1
 
     async def run(self):
         while True:
@@ -58,26 +59,18 @@ class BackgroundQueueHandler:
                 worker_idx = self.find_available_worker()
                 print(worker_idx)
                 if worker_idx == -1:
-                    # no worker available wait till they are
-                    logger.info("In No worker idx")
-                    msgdict = self.queue.pop()
-                    msgdict.update({"workerid": "not this worker"})
-                    await aioproducer.send(
-                        topicname, json.dumps(msgdict).encode("ascii")
-                    )
-                    self.queue.pop()
                     await asyncio.sleep(5)
                     continue
 
                 logger.info("Here in working terrain")
                 msgdict = self.queue.pop()
-                msgdict.update({"workerid": self.workers[worker_idx].id})
-                logger.info(f"sending msg to {self.workers[worker_idx].id}")
+                msgdict.update({"workerip": self.workers[worker_idx].ip})
+                logger.info(f"sending msg to {self.workers[worker_idx].ip}")
                 r = await aioproducer.send(
                     topicname, json.dumps(msgdict).encode("ascii")
                 )
                 print(r)
-                await asyncio.sleep(1)
+                await asyncio.sleep(5)
                 # self.workers[worker_idx].available = False
 
 
@@ -95,12 +88,13 @@ async def shutdown_event():
     await aioproducer.stop()
 
 
-@app.get("/worker/register/{id}")
-async def register_worker(id: str, request: Request):
+@app.get("/worker/register/{ip}")
+async def register_worker(ip: str, request: Request):
     # TODO: get worker path dynamically
-    handler.workers.append(Worker(id, True))
+    ip = ":".join(ip.split("_"))
+    handler.workers.append(Worker(ip, True))
     logger.info(handler.workers)
-    return {"success": True, "message": "Added worker successfully!", "worker_id": id}
+    return {"success": True, "message": "Added worker successfully!", "workerip": ip}
 
 
 @app.post(f"/producer/{topicname}")

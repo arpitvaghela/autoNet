@@ -15,4 +15,3 @@ asyncio
 starlette
 kafka-logging-handler
 fastapi
-docker

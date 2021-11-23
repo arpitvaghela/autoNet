@@ -55,21 +55,43 @@ services:
             - "zookeeper"
             - "controller"
         restart: unless-stopped
-        command: uvicorn main:app --reload --workers 1 --host 0.0.0.0
+        command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 5010
         ports:
-          - "5005:5000"
-          - "5015:5010"
+          - "5010:5010"
         volumes:
             - ./worker/:/usr/src/app
         environment:
             KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
             KAFKA_PORT: 9092
+            WORKER_PORT: 5010
+            CONTROLLER_IP: controller
         deploy:
             resources:
                 reservations:
                     devices:
                         - driver: nvidia
                           capabilities: ["gpu"]
+    
+    worker-cpu:
+        build:
+            context: ./worker
+            dockerfile: Dockerfile
+
+        depends_on:
+            - "kafka"
+            - "zookeeper"
+            - "controller"
+        restart: unless-stopped
+        command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 5011
+        ports:
+          - "5011:5011"
+        volumes:
+            - ./worker/:/usr/src/app
+        environment:
+            KAFKA_HOST: ${DOCKER_GATEWAY_HOST}
+            KAFKA_PORT: 9092
+            WORKER_PORT: 5011
+
 
     datastore:
         build:

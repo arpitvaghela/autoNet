@@ -11,6 +11,8 @@ config = Config(".env")
 PROJECT_NAME: str = config("PROJECT_NAME", default="autoNET-controller")
 KAFKA_URI: str = config("KAFKA_HOST")
 KAFKA_PORT: str = config("KAFKA_PORT")
+WORKER_PORT: str = config("WORKER_PORT")
+CONTROLLER_IP: str = config("CONTROLLER_IP")
 KAFKA_INSTANCE = KAFKA_URI + ":" + KAFKA_PORT
 DEBUG: bool = config("DEBUG", cast=bool, default=False)
 
