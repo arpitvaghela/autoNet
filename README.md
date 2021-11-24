@@ -9,6 +9,7 @@ As a part of the university curriculum, this project was an Artificial Intellige
 
 ## Approach 
 ![Alt text](weighted_random.jpg?raw=true "Title")
+![Alt text](DARTS.PNG?raw=true "Title")
 
 ## Cloud Platform
 -   We build a platform using a high performance microservices architecture with advanced asynchronous intercommunication between microservices using queues and scheduling
