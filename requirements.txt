@@ -1,0 +1,10 @@
+numpy
+graphviz
+torch
+torchvision
+tensorboard
+tensorboardX
+loguru
+pytest
+pytest-cov
+pytest-asyncio
