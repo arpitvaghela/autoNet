@@ -8,6 +8,7 @@ We address the problem of Architecture Search through the method of DARTS: Diffe
 As a part of the university curriculum, this project was an Artificial Intelligence and Cloud Computing Joint Project.
 
 ## Approach 
+![Alt text](relative/path/to/img.jpg?raw=true "Title")
 
 ## Cloud Platform
 -   We build a platform using a high performance microservices architecture with advanced asynchronous intercommunication between microservices using queues and scheduling
