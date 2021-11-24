@@ -1,7 +1,20 @@
-# autoNet
 
-Autogenerate RNN and CNN architecture using DARTS Differential Architecture Search
+# autoNet: Differentiable Architecture Search and Weighted Random Hyperparameter Selection
 
+## Introduction
+
+We address the problem of Architecture Search through the method of DARTS: Differentiable Architecture Search and enhance the same with hyperparameter search via Weighted Random Hyperparameter search with fixed two-point initialisation.
+
+As a part of the university curriculum, this project was an Artificial Intelligence and Cloud Computing Joint Project.
+
+## Approach 
+
+## Cloud Platform
+-   We build a platform using a high performance microservices architecture with advanced asynchronous intercommunication between microservices using queues and scheduling
+    
+-   A robust system is built by extensive use of docker containerisation, Network virtualization and GPU passthrough
+    
+-   Infinite scaling of workers is supported and load balancing on inference APIs. All services represented under one umbrella API gateway.
 ## Remotely train model for iris dataset
 
 The worker process trains the model and returns the log (acurracy) to the master process
