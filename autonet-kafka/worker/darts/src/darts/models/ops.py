@@ -15,6 +15,9 @@ OPS = {
     "skip_connect": lambda C, stride, affine: Identity()
     if stride == 1
     else FactorizedReduce(C, C, affine=affine),
+    "sep_conv_2x2": lambda C, stride, affine: SepConv(
+        C, C, 2, stride, 1, affine=affine
+    ),
     "sep_conv_3x3": lambda C, stride, affine: SepConv(
         C, C, 3, stride, 1, affine=affine
     ),
@@ -23,6 +26,9 @@ OPS = {
     ),
     "sep_conv_7x7": lambda C, stride, affine: SepConv(
         C, C, 7, stride, 3, affine=affine
+    ),
+    "dil_conv_2x2": lambda C, stride, affine: DilConv(
+        C, C, 2, stride, 2, 2, affine=affine
     ),
     "dil_conv_3x3": lambda C, stride, affine: DilConv(
         C, C, 3, stride, 2, 2, affine=affine
@@ -33,8 +39,13 @@ OPS = {
     "conv_7x1_1x7": lambda C, stride, affine: FacConv(
         C, C, 7, stride, 3, affine=affine
     ),
+    "conv_5x1_1x5": lambda C, stride, affine: FacConv(
+        C, C, 5, stride, 3, affine=affine
+    ),
+    "conv_3x1_1x3": lambda C, stride, affine: FacConv(
+        C, C, 5, stride, 3, affine=affine
+    ),
 }
-
 
 def drop_path_(x, drop_prob, training):
     if training and drop_prob > 0.0:
