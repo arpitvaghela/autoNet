@@ -47,7 +47,7 @@ class BackgroundQueueHandler:
             logger.info(msg)
             if msg["available"]:
                 return i
-            return -1
+        return -1
 
     async def run(self):
         while True:
