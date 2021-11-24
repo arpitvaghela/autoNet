@@ -1,6 +1,8 @@
 numpy
 graphviz
 torch
+tensorflow
+keras
 torchvision
 tensorboard
 tensorboardX
