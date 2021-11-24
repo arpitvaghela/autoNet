@@ -18,6 +18,21 @@ The  approach  of  Weighted  Random  search  starts  initiates with  identifying
 
 
 ## Results
+![Alt text](Darts-1.PNG?raw=true "Title")
+
+The result above represents the performance of the optimised architecture through DARTS in image classification on CIFAR-10 dataset
+
+![Alt text](DARTS-2.PNG?raw=true "Title")
+
+The result above represents the performance of the optimised architecture through DARTS in image classification on Penn Treebank dataset
+
+![Alt text](wr_loss.png?raw=true "Title")
+
+The result above represents the variation of Validation Loss in architecture with increasing iterations of Weighted Random Hyperparameter search with two point fixed initialisation
+
+![Alt text](wr_acc.png?raw=true "Title")
+
+The result above represents the variation of Accuracy in architecture with increasing iterations of Weighted Random Hyperparameter search with two point fixed initialisation
 
 ## Remotely train model for iris dataset
 
